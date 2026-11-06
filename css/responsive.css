@@ -1,0 +1,69 @@
+/* Responsive Breakpoints & Mobile Adaptations for Studio Layout */
+
+@media (max-width: 1200px) {
+    .visualizer-studio-grid {
+        grid-template-columns: 270px 1fr;
+    }
+
+    .telemetry-column {
+        grid-column: span 2;
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 1.25rem;
+    }
+}
+
+@media (max-width: 900px) {
+    .visualizer-studio-grid {
+        grid-template-columns: 1fr;
+        padding-top: 1rem;
+    }
+
+    .telemetry-column {
+        grid-column: span 1;
+        grid-template-columns: 1fr;
+    }
+
+    .app-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.75rem;
+    }
+
+    .app-header-actions {
+        align-self: flex-end;
+    }
+
+    .canvas-header-bar {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 0.75rem;
+    }
+
+    .view-mode-switch {
+        align-self: flex-end;
+    }
+
+    .maze-grid-matrix.isometric-3d {
+        transform: rotateX(50deg) rotateZ(-30deg) scale(0.85);
+    }
+}
+
+@media (max-width: 600px) {
+    .content-container {
+        padding: 0 0.85rem;
+    }
+
+    .grid-studio-card {
+        padding: 1rem 0.75rem;
+    }
+
+    .grid-bottom-legend {
+        gap: 0.65rem;
+        font-size: 0.7rem;
+    }
+
+    .tool-grid {
+        grid-template-columns: 1fr 1fr;
+    }
+}

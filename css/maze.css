@@ -1,0 +1,360 @@
+/* Center Visualizer Studio & Interactive Grid Canvas */
+.grid-studio-card {
+    background: var(--bg-surface);
+    border: 1px solid var(--border-subtle);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-card);
+    padding: 1.5rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: space-between;
+    min-height: 540px;
+    position: relative;
+    overflow: hidden;
+}
+
+/* Canvas Header with Playback Toolbar & Segmented 3D View Switch */
+.canvas-header-bar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+    padding-bottom: 0.85rem;
+    margin-bottom: 0.85rem;
+    border-bottom: 1px solid var(--border-subtle);
+    gap: 1rem;
+    flex-wrap: wrap;
+}
+
+.playback-controls-group {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+}
+
+.playback-step-badge {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.78rem;
+    font-weight: 600;
+    color: var(--text-secondary);
+    background: var(--bg-surface-elevated);
+    border: 1px solid var(--border-subtle);
+    padding: 0.35rem 0.65rem;
+    border-radius: var(--radius-sm);
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+}
+
+/* 3D Segmented Control (Properly Positioned) */
+.view-mode-switch {
+    display: inline-flex;
+    align-items: center;
+    background: var(--bg-surface-elevated);
+    border: 1px solid var(--border-subtle);
+    border-radius: var(--radius-full);
+    padding: 3px;
+    gap: 2px;
+}
+
+.view-mode-btn {
+    border: none;
+    background: transparent;
+    color: var(--text-secondary);
+    font-size: 0.75rem;
+    font-weight: 600;
+    padding: 0.35rem 0.85rem;
+    border-radius: var(--radius-full);
+    cursor: pointer;
+    transition: all var(--transition-fast);
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+}
+
+.view-mode-btn:hover {
+    color: var(--text-primary);
+}
+
+.view-mode-btn.active {
+    background: var(--primary);
+    color: #ffffff;
+    box-shadow: 0 2px 6px rgba(99, 102, 241, 0.35);
+}
+
+/* 3D Viewport Wrapper */
+.grid-viewport-wrapper {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    perspective: 1000px;
+    perspective-origin: 50% 45%;
+    padding: 1.5rem 0;
+    flex: 1;
+    min-height: 400px;
+    overflow: visible;
+}
+
+/* The Grid Element */
+.maze-grid-matrix {
+    display: inline-grid;
+    gap: 2px;
+    background: var(--border-subtle);
+    padding: 4px;
+    border-radius: 10px;
+    border: 1px solid var(--border-subtle);
+    user-select: none;
+    -webkit-user-select: none;
+    touch-action: none;
+    transition: transform 0.5s cubic-bezier(0.2, 0.8, 0.2, 1), box-shadow 0.5s ease;
+    transform-style: preserve-3d;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.04);
+}
+
+/* Enhanced 3D Isometric View Mode */
+.maze-grid-matrix.isometric-3d {
+    transform: rotateX(52deg) rotateZ(-32deg) scale(0.92);
+    box-shadow: 
+        -20px 30px 50px rgba(0, 0, 0, 0.18),
+        -5px 10px 20px rgba(99, 102, 241, 0.08);
+}
+
+[data-theme="dark"] .maze-grid-matrix.isometric-3d {
+    box-shadow: 
+        -20px 30px 60px rgba(0, 0, 0, 0.65),
+        -5px 10px 25px rgba(99, 102, 241, 0.2);
+}
+
+/* Cells */
+.maze-cell {
+    background: var(--node-empty);
+    border-radius: 2px;
+    transition: background-color 0.15s ease, transform 0.2s ease, box-shadow 0.2s ease;
+    cursor: pointer;
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transform-style: preserve-3d;
+}
+
+.maze-cell:hover {
+    transform: scale(1.08);
+    z-index: 2;
+}
+
+/* Tool Placement Mode Cursors */
+.grid-mode-start .maze-cell:hover { background: rgba(16, 185, 129, 0.2); }
+.grid-mode-goal .maze-cell:hover { background: rgba(244, 63, 94, 0.2); }
+.grid-mode-wall .maze-cell:hover { background: rgba(71, 85, 105, 0.3); }
+
+/* Wall Node */
+.maze-cell.wall {
+    background: var(--node-wall);
+    border-color: var(--node-wall);
+    animation: cellPop 0.18s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+/* 3D Extrusion on Walls */
+.maze-grid-matrix.isometric-3d .maze-cell.wall {
+    box-shadow: var(--shadow-3d-wall);
+    transform: translateZ(14px);
+    background: linear-gradient(135deg, #64748b 0%, #334155 100%);
+}
+
+/* Start Node */
+.maze-cell.start {
+    background: var(--node-start);
+    z-index: 5;
+    box-shadow: 0 0 10px rgba(16, 185, 129, 0.45);
+}
+
+.maze-cell.start::after {
+    content: '▲';
+    font-size: 11px;
+    color: #ffffff;
+    font-weight: 800;
+}
+
+.maze-grid-matrix.isometric-3d .maze-cell.start {
+    box-shadow: var(--shadow-3d-start);
+    transform: translateZ(12px);
+    animation: pinFloat 2s ease-in-out infinite alternate;
+}
+
+/* Goal Node */
+.maze-cell.goal {
+    background: var(--node-goal);
+    z-index: 5;
+    box-shadow: 0 0 10px rgba(244, 63, 94, 0.45);
+}
+
+.maze-cell.goal::after {
+    content: '★';
+    font-size: 13px;
+    color: #ffffff;
+}
+
+.maze-grid-matrix.isometric-3d .maze-cell.goal {
+    box-shadow: var(--shadow-3d-goal);
+    transform: translateZ(12px);
+    animation: pinFloat 2s ease-in-out 0.5s infinite alternate;
+}
+
+@keyframes pinFloat {
+    0% { transform: translateZ(12px); }
+    100% { transform: translateZ(16px); }
+}
+
+/* Visited / Closed-List State (Blue) */
+.maze-cell.visited {
+    background: var(--node-visited);
+    animation: visitedFade 0.25s ease-out;
+}
+
+.maze-grid-matrix.isometric-3d .maze-cell.visited {
+    transform: translateZ(2px);
+    box-shadow: 0 1px 2px rgba(147, 197, 253, 0.4);
+}
+
+/* Frontier / Open-List State (Purple glowing) */
+.maze-cell.frontier {
+    background: var(--node-frontier);
+    box-shadow: 0 0 8px rgba(192, 132, 252, 0.6);
+    animation: pulseFrontier 1.2s infinite alternate;
+    z-index: 3;
+}
+
+.maze-grid-matrix.isometric-3d .maze-cell.frontier {
+    transform: translateZ(5px);
+    box-shadow: 0 3px 0 #9333ea, 0 6px 10px rgba(192, 132, 252, 0.4);
+}
+
+/* Backtracking Highlight (Red/Orange flash) */
+.maze-cell.backtrack {
+    background: var(--node-backtrack) !important;
+    box-shadow: 0 0 14px var(--node-backtrack);
+    animation: backtrackFlash 0.4s ease;
+}
+
+/* Current Evaluating Node */
+.maze-cell.current {
+    background: var(--node-current) !important;
+    box-shadow: 0 0 16px var(--node-current);
+    transform: scale(1.15);
+    z-index: 6;
+}
+
+.maze-grid-matrix.isometric-3d .maze-cell.current {
+    transform: translateZ(10px) scale(1.1);
+    box-shadow: 0 4px 0 #d97706, 0 8px 16px rgba(251, 191, 36, 0.6);
+}
+
+/* Final Solution Path - Greedy (Amber) */
+.maze-cell.path-greedy {
+    background: var(--node-path);
+    box-shadow: 0 0 12px rgba(245, 158, 11, 0.7);
+    animation: pathTrace 0.3s ease forwards;
+    z-index: 4;
+}
+
+.maze-grid-matrix.isometric-3d .maze-cell.path-greedy {
+    transform: translateZ(6px);
+    box-shadow: 0 3px 0 #b45309, 0 0 14px rgba(245, 158, 11, 0.8);
+}
+
+/* A* Optimal Path Overlay (Cyan) */
+.maze-cell.path-astar {
+    background: var(--node-path-astar);
+    box-shadow: 0 0 12px rgba(6, 182, 212, 0.7);
+    z-index: 4;
+}
+
+.maze-grid-matrix.isometric-3d .maze-cell.path-astar {
+    transform: translateZ(8px);
+    box-shadow: 0 3px 0 #0e7490, 0 0 14px rgba(6, 182, 212, 0.8);
+}
+
+/* Overlap: when both paths share a cell */
+.maze-cell.path-greedy.path-astar {
+    background: linear-gradient(135deg, var(--node-path) 50%, var(--node-path-astar) 50%);
+    box-shadow: 0 0 14px rgba(245, 158, 11, 0.5), 0 0 14px rgba(6, 182, 212, 0.5);
+}
+
+/* Bottom Grid Legend - Modern Chip Pills */
+.grid-bottom-legend {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.45rem 0.6rem;
+    padding-top: 1rem;
+    border-top: 1px solid var(--border-subtle);
+    width: 100%;
+    flex-wrap: wrap;
+}
+
+.bottom-legend-item {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    background: var(--bg-surface-elevated);
+    border: 1px solid var(--border-subtle);
+    border-radius: var(--radius-full);
+    padding: 0.28rem 0.65rem;
+    font-size: 0.72rem;
+    font-weight: 600;
+    color: var(--text-secondary);
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.02);
+    transition: all var(--transition-fast);
+}
+
+.bottom-legend-item:hover {
+    color: var(--text-primary);
+    border-color: var(--border-focus);
+    transform: translateY(-1px);
+}
+
+.bottom-swatch {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    flex-shrink: 0;
+}
+
+.bottom-swatch.start { background: var(--node-start); }
+.bottom-swatch.goal { background: var(--node-goal); }
+.bottom-swatch.wall { background: var(--node-wall); border-radius: 2px; }
+.bottom-swatch.visited { background: var(--node-visited); }
+.bottom-swatch.frontier { background: var(--node-frontier); }
+.bottom-swatch.greedy { background: var(--node-path); }
+.bottom-swatch.astar { background: var(--node-path-astar); }
+
+/* Keyframe Animations */
+@keyframes cellPop {
+    0% { transform: scale(0.3); opacity: 0; }
+    100% { transform: scale(1); opacity: 1; }
+}
+
+@keyframes visitedFade {
+    0% { transform: scale(0.4); opacity: 0; }
+    50% { transform: scale(1.1); }
+    100% { transform: scale(1); opacity: 1; }
+}
+
+@keyframes pulseFrontier {
+    0% { opacity: 0.75; transform: scale(0.96); }
+    100% { opacity: 1; transform: scale(1.04); }
+}
+
+@keyframes pathTrace {
+    0% { transform: scale(0.3); opacity: 0; }
+    70% { transform: scale(1.2); }
+    100% { transform: scale(1); opacity: 1; }
+}
+
+@keyframes backtrackFlash {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.25); background: #f43f5e; }
+}

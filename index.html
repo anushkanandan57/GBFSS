@@ -1,0 +1,701 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Greedy Best-First Search Maze Visualizer</title>
+    <meta
+      name="description"
+      content="Greedy Best-First Search maze visualizer demonstrating heuristic-driven search, backtracking, and suboptimal paths compared against A* optimal search."
+    />
+    <!-- Google Fonts Inter & JetBrains Mono -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <!-- Master Stylesheet -->
+    <link rel="stylesheet" href="css/main.css" />
+  </head>
+  <body>
+    <div class="page-wrapper">
+      <div class="content-container">
+        <!-- Top App Header (No Navbar as requested) -->
+        <header class="app-header">
+          <div class="app-title-group">
+            <div class="app-logo-badge">
+              <svg
+                width="22"
+                height="22"
+                viewBox="0 0 24 24"
+                fill="currentColor"
+              >
+                <path
+                  d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"
+                />
+              </svg>
+            </div>
+            <div>
+              <h1 class="app-title">Greedy Best-First Search</h1>
+            </div>
+          </div>
+
+          <div class="app-header-actions">
+            <button
+              class="theme-toggle-btn"
+              id="themeToggleBtn"
+              aria-label="Toggle theme"
+            >
+              <!-- Sun Icon for Light Theme -->
+              <svg
+                width="17"
+                height="17"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+              >
+                <circle cx="12" cy="12" r="5"></circle>
+                <line x1="12" y1="1" x2="12" y2="3"></line>
+                <line x1="12" y1="21" x2="12" y2="23"></line>
+                <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+                <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+                <line x1="1" y1="12" x2="3" y2="12"></line>
+                <line x1="21" y1="12" x2="23" y2="12"></line>
+                <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+                <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+              </svg>
+            </button>
+          </div>
+        </header>
+
+        <!-- Main 3-Column Studio -->
+        <div class="visualizer-studio-grid">
+          <!-- Left Panel: Settings & Tools -->
+          <aside class="settings-panel">
+            <div class="settings-header">
+              <h2 class="settings-title">
+                <svg
+                  class="settings-title-icon"
+                  width="18"
+                  height="18"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                >
+                  <circle cx="12" cy="12" r="3"></circle>
+                  <path
+                    d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"
+                  ></path>
+                </svg>
+                Controls &amp; Tools
+              </h2>
+              <button
+                class="btn-reset-link"
+                id="resetAllBtn"
+                title="Reset all settings"
+              >
+                <svg
+                  width="13"
+                  height="13"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                >
+                  <path
+                    d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"
+                  ></path>
+                  <path d="M3 3v5h5"></path>
+                </svg>
+                Reset
+              </button>
+            </div>
+
+            <!-- Node Tool Picker (Start, Goal, Wall, Erase) -->
+            <div>
+              <div class="tool-picker-label">
+                <span>Interactive Placement Tool</span>
+              </div>
+              <div class="tool-grid">
+                <button
+                  class="tool-btn start-tool"
+                  id="toolStartBtn"
+                  title="Click grid to relocate Start node"
+                >
+                  <span class="tool-badge-dot start"></span>
+                  <span>Set Start (▲)</span>
+                </button>
+                <button
+                  class="tool-btn goal-tool"
+                  id="toolGoalBtn"
+                  title="Click grid to relocate Goal node"
+                >
+                  <span class="tool-badge-dot goal"></span>
+                  <span>Set Goal (★)</span>
+                </button>
+                <button
+                  class="tool-btn active"
+                  id="toolWallBtn"
+                  title="Click/drag to draw walls"
+                >
+                  <span class="tool-badge-dot wall"></span>
+                  <span>Draw Wall</span>
+                </button>
+                <button
+                  class="tool-btn"
+                  id="toolEraseBtn"
+                  title="Click/drag to erase walls"
+                >
+                  <span class="tool-badge-dot erase"></span>
+                  <span>Erase</span>
+                </button>
+              </div>
+            </div>
+
+            <!-- Grid Size Slider -->
+            <div class="control-field">
+              <div class="field-label-row">
+                <span>Grid Dimensions</span>
+                <span class="field-val-badge" id="gridSizeLabel"
+                  >20 &times; 20</span
+                >
+              </div>
+              <input
+                type="range"
+                id="gridSizeSlider"
+                class="purple-slider"
+                min="10"
+                max="30"
+                value="20"
+                step="2"
+              />
+            </div>
+
+            <!-- Speed Multipliers (0.25x, 0.5x, 1x, 2x, 4x) -->
+            <div class="control-field">
+              <div class="field-label-row">
+                <span>Animation Speed</span>
+              </div>
+              <div class="speed-multiplier-bar">
+                <button class="speed-step-btn" data-speed="0.25">0.25x</button>
+                <button class="speed-step-btn" data-speed="0.5">0.5x</button>
+                <button class="speed-step-btn active" data-speed="1">1x</button>
+                <button class="speed-step-btn" data-speed="2">2x</button>
+                <button class="speed-step-btn" data-speed="4">4x</button>
+              </div>
+            </div>
+
+            <!-- Action Buttons -->
+            <div class="settings-actions">
+              <!-- Primary Run Button -->
+              <button
+                class="btn-ui btn-ui-run"
+                id="runGreedyBtn"
+                style="padding: 0.75rem 1rem; font-size: 0.9rem"
+              >
+                <svg
+                  width="16"
+                  height="16"
+                  viewBox="0 0 24 24"
+                  fill="currentColor"
+                >
+                  <path d="M8 5v14l11-7z" />
+                </svg>
+                <span>Run Greedy Search</span>
+              </button>
+
+              <!-- Preset Suboptimal Trap Demonstration -->
+              <button
+                class="btn-ui btn-preset-trap"
+                id="loadTrapBtn"
+                title="Load a concave obstacle demonstrating Greedy suboptimality"
+              >
+                <svg
+                  width="15"
+                  height="15"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2.5"
+                >
+                  <polygon
+                    points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"
+                  ></polygon>
+                </svg>
+                <span>Load Suboptimal Trap</span>
+              </button>
+
+              <!-- Procedural Maze -->
+              <button class="btn-ui btn-ui-primary" id="generateMazeBtn">
+                <svg
+                  width="15"
+                  height="15"
+                  viewBox="0 0 24 24"
+                  fill="currentColor"
+                >
+                  <path
+                    d="M3 3v18h18V3H3zm16 16H5V5h14v14zM11 7h2v4h-2V7zm0 6h2v4h-2v-4z"
+                  />
+                </svg>
+                <span>Generate Maze</span>
+              </button>
+
+              <!-- Random Walls -->
+              <button class="btn-ui btn-ui-secondary" id="randomWallsBtn">
+                <svg
+                  width="14"
+                  height="14"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                >
+                  <polyline points="16 3 21 3 21 8"></polyline>
+                  <line x1="4" y1="20" x2="21" y2="3"></line>
+                  <polyline points="21 16 21 21 16 21"></polyline>
+                  <line x1="15" y1="15" x2="21" y2="21"></line>
+                  <line x1="4" y1="4" x2="9" y2="9"></line>
+                </svg>
+                <span>Random Walls</span>
+              </button>
+
+              <!-- Clear Grid -->
+              <button class="btn-ui btn-ui-secondary" id="clearGridBtn">
+                <svg
+                  width="14"
+                  height="14"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                >
+                  <polyline points="3 6 5 6 21 6"></polyline>
+                  <path
+                    d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"
+                  ></path>
+                </svg>
+                <span>Clear Grid</span>
+              </button>
+            </div>
+          </aside>
+
+          <!-- Center Panel: Grid Studio Canvas -->
+          <main class="grid-studio-card">
+            <!-- Top Toolbar: Playback + Step Counter + 3D View Switch -->
+            <div class="canvas-header-bar">
+              <!-- Left Playback Buttons -->
+              <div class="playback-controls-group">
+                <button
+                  class="circle-icon-btn active-play"
+                  id="canvasPlayBtn"
+                  data-tooltip="Play / Pause (Space)"
+                >
+                  <svg
+                    width="15"
+                    height="15"
+                    viewBox="0 0 24 24"
+                    fill="currentColor"
+                  >
+                    <path d="M8 5v14l11-7z" />
+                  </svg>
+                </button>
+                <button
+                  class="circle-icon-btn"
+                  id="canvasStepBackBtn"
+                  data-tooltip="Step Back (←)"
+                >
+                  <svg
+                    width="14"
+                    height="14"
+                    viewBox="0 0 24 24"
+                    fill="currentColor"
+                  >
+                    <path d="M6 6h2v12H6zm3.5 6l8.5 6V6z" />
+                  </svg>
+                </button>
+                <button
+                  class="circle-icon-btn"
+                  id="canvasStepFwdBtn"
+                  data-tooltip="Step Forward (→)"
+                >
+                  <svg
+                    width="14"
+                    height="14"
+                    viewBox="0 0 24 24"
+                    fill="currentColor"
+                  >
+                    <path d="M6 18l8.5-6L6 6v12zM16 6v12h2V6h-2z" />
+                  </svg>
+                </button>
+                <button
+                  class="circle-icon-btn"
+                  id="canvasRestartBtn"
+                  data-tooltip="Replay search"
+                >
+                  <svg
+                    width="14"
+                    height="14"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                  >
+                    <path
+                      d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"
+                    ></path>
+                    <path d="M3 3v5h5"></path>
+                  </svg>
+                </button>
+                <span class="playback-step-badge" id="canvasStepBadge"
+                  >Step 0 / 0</span
+                >
+              </div>
+
+              <!-- Right: Clean Segmented 3D View Switch (Properly Positioned) -->
+              <div
+                class="view-mode-switch"
+                role="group"
+                aria-label="Canvas View Mode"
+              >
+                <button
+                  class="view-mode-btn active"
+                  id="btnView2D"
+                  title="2D Orthographic Grid"
+                >
+                  <span>2D Grid</span>
+                </button>
+                <button
+                  class="view-mode-btn"
+                  id="btnView3D"
+                  title="3D Isometric Tilt View with Extruded Blocks"
+                >
+                  <span>3D Isometric</span>
+                </button>
+              </div>
+            </div>
+
+            <!-- Interactive Grid Canvas with 3D capability -->
+            <div class="grid-viewport-wrapper">
+              <div class="maze-grid-matrix" id="mazeGrid"></div>
+            </div>
+
+            <!-- Bottom Grid Legend -->
+            <div class="grid-bottom-legend">
+              <div class="bottom-legend-item">
+                <span class="bottom-swatch start"></span>
+                <span>Start (▲)</span>
+              </div>
+              <div class="bottom-legend-item">
+                <span class="bottom-swatch goal"></span>
+                <span>Goal (★)</span>
+              </div>
+              <div class="bottom-legend-item">
+                <span class="bottom-swatch wall"></span>
+                <span>Wall</span>
+              </div>
+              <div class="bottom-legend-item">
+                <span class="bottom-swatch visited"></span>
+                <span>Visited</span>
+              </div>
+              <div class="bottom-legend-item">
+                <span class="bottom-swatch frontier"></span>
+                <span>Frontier</span>
+              </div>
+              <div class="bottom-legend-item">
+                <span class="bottom-swatch greedy"></span>
+                <span>Greedy Path</span>
+              </div>
+              <div class="bottom-legend-item">
+                <span class="bottom-swatch astar"></span>
+                <span>A* Optimal</span>
+              </div>
+            </div>
+          </main>
+
+          <!-- Right Panel: Assignment Telemetry & A* Comparison -->
+          <aside class="telemetry-column">
+            <!-- Search Telemetry Card -->
+            <div class="stats-card">
+              <div class="card-header-row">
+                <h2 class="card-header-title">
+                  <svg
+                    class="card-header-icon"
+                    width="18"
+                    height="18"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                  >
+                    <line x1="18" y1="20" x2="18" y2="10"></line>
+                    <line x1="12" y1="20" x2="12" y2="4"></line>
+                    <line x1="6" y1="20" x2="6" y2="14"></line>
+                  </svg>
+                  Search Telemetry
+                </h2>
+              </div>
+
+              <!-- Current Node -->
+              <div class="stat-item-row">
+                <div class="stat-item-left">
+                  <div class="stat-icon-badge amber">
+                    <svg
+                      width="15"
+                      height="15"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="2"
+                    >
+                      <circle cx="12" cy="12" r="10"></circle>
+                      <polyline points="12 6 12 12 14 14"></polyline>
+                    </svg>
+                  </div>
+                  <div class="stat-text-group">
+                    <span class="stat-text-label">Current Node</span>
+                    <span class="stat-text-val" id="statCurrentNode">-</span>
+                  </div>
+                </div>
+                <span
+                  class="stat-text-val"
+                  id="statHeuristicVal"
+                  style="color: #d97706; font-size: 0.8rem"
+                  >h = -</span
+                >
+              </div>
+
+              <!-- Expansion Order -->
+              <div class="stat-item-row">
+                <div class="stat-item-left">
+                  <div class="stat-icon-badge blue">
+                    <svg
+                      width="15"
+                      height="15"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="2"
+                    >
+                      <circle cx="12" cy="12" r="10"></circle>
+                      <path d="M12 8v8M8 12h8"></path>
+                    </svg>
+                  </div>
+                  <div class="stat-text-group">
+                    <span class="stat-text-label">Node Expansion Order</span>
+                    <span class="stat-text-val" id="statExpansionOrder"
+                      >#0</span
+                    >
+                  </div>
+                </div>
+              </div>
+
+              <!-- Frontier / Open List -->
+              <div class="stat-item-row">
+                <div class="stat-item-left">
+                  <div class="stat-icon-badge purple">
+                    <svg
+                      width="15"
+                      height="15"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="2"
+                    >
+                      <polygon points="12 2 2 7 12 12 22 7 12 2"></polygon>
+                      <polyline points="2 17 12 22 22 17"></polyline>
+                      <polyline points="2 12 12 17 22 12"></polyline>
+                    </svg>
+                  </div>
+                  <div class="stat-text-group">
+                    <span class="stat-text-label">Frontier (Open-List)</span>
+                    <span class="stat-text-val" id="statFrontierSize"
+                      >0 nodes</span
+                    >
+                  </div>
+                </div>
+              </div>
+
+              <!-- Visited / Closed List -->
+              <div class="stat-item-row">
+                <div class="stat-item-left">
+                  <div class="stat-icon-badge cyan">
+                    <svg
+                      width="15"
+                      height="15"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="2"
+                    >
+                      <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+                      <polyline points="22 4 12 14.01 9 11.01"></polyline>
+                    </svg>
+                  </div>
+                  <div class="stat-text-group">
+                    <span class="stat-text-label">Visited (Closed-List)</span>
+                    <span class="stat-text-val" id="statVisitedCount"
+                      >0 nodes</span
+                    >
+                  </div>
+                </div>
+              </div>
+
+              <!-- Execution Time -->
+              <div class="stat-item-row">
+                <div class="stat-item-left">
+                  <div class="stat-icon-badge rose">
+                    <svg
+                      width="15"
+                      height="15"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="2"
+                    >
+                      <circle cx="12" cy="12" r="10"></circle>
+                      <polyline points="12 6 12 12 16 14"></polyline>
+                    </svg>
+                  </div>
+                  <div class="stat-text-group">
+                    <span class="stat-text-label">Execution Time</span>
+                    <span class="stat-text-val" id="statExecTime">0.0 ms</span>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Backtracking Alert Indicator -->
+              <div class="backtrack-alert-box" id="statBacktrackAlert">
+                <span>ℹ️</span>
+                <span>Ready to search maze</span>
+              </div>
+            </div>
+
+            <!-- Comparison & Suboptimality Card -->
+            <div class="compare-card">
+              <div class="card-header-row">
+                <h2 class="card-header-title">
+                  <svg
+                    class="card-header-icon"
+                    width="18"
+                    height="18"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                  >
+                    <rect
+                      x="3"
+                      y="3"
+                      width="18"
+                      height="18"
+                      rx="2"
+                      ry="2"
+                    ></rect>
+                    <line x1="9" y1="3" x2="9" y2="21"></line>
+                  </svg>
+                  Greedy vs A* Optimal Path
+                </h2>
+              </div>
+
+              <!-- A* Overlay Toggle -->
+              <div class="overlay-toggle-box">
+                <div class="overlay-toggle-info">
+                  <span class="overlay-toggle-title">
+                    <span>Show A* Optimal Overlay</span>
+                  </span>
+                  <span class="overlay-toggle-sub"
+                    >Visually overlay A*'s shortest path (Cyan)</span
+                  >
+                </div>
+                <label class="switch-label">
+                  <input type="checkbox" id="overlayToggleInput" />
+                  <span class="switch-slider"></span>
+                </label>
+              </div>
+
+              <!-- Metric Comparison Table -->
+              <div class="compare-table">
+                <!-- Greedy Row -->
+                <div class="compare-row greedy-row">
+                  <div style="display: flex; align-items: center; gap: 0.4rem">
+                    <span style="color: var(--color-greedy); font-weight: 700"
+                      >●</span
+                    >
+                    <span class="compare-label">Greedy Path Cost:</span>
+                  </div>
+                  <span class="compare-val" id="cmpGreedyLength">-</span>
+                </div>
+
+                <div class="compare-row greedy-row">
+                  <span
+                    class="compare-label"
+                    style="font-size: 0.72rem; color: var(--text-secondary)"
+                    >Greedy Nodes Expanded:</span
+                  >
+                  <span
+                    class="compare-val"
+                    id="cmpGreedyExpanded"
+                    style="font-size: 0.75rem"
+                    >-</span
+                  >
+                </div>
+
+                <!-- A* Row -->
+                <div class="compare-row astar-row">
+                  <div style="display: flex; align-items: center; gap: 0.4rem">
+                    <span style="color: var(--color-astar); font-weight: 700"
+                      >●</span
+                    >
+                    <span class="compare-label">A* Optimal Cost:</span>
+                  </div>
+                  <span class="compare-val" id="cmpAstarLength">-</span>
+                </div>
+
+                <div class="compare-row astar-row">
+                  <span
+                    class="compare-label"
+                    style="font-size: 0.72rem; color: var(--text-secondary)"
+                    >A* Nodes Expanded:</span
+                  >
+                  <span
+                    class="compare-val"
+                    id="cmpAstarExpanded"
+                    style="font-size: 0.75rem"
+                    >-</span
+                  >
+                </div>
+              </div>
+
+              <!-- Suboptimality Verdict -->
+              <div class="optimality-verdict-box" id="optimalityVerdictBox">
+                Run search to compare Greedy suboptimality against A*.
+              </div>
+            </div>
+          </aside>
+        </div>
+      </div>
+
+      <!-- Site Footer -->
+      <footer class="site-footer">
+        <div class="footer-inner">
+          <span> Made by <strong>Team Codex</strong></span>
+        </div>
+      </footer>
+    </div>
+
+    <!-- Modular Vanilla JavaScript Scripts -->
+    <script src="js/core/PriorityQueue.js"></script>
+    <script src="js/core/Heuristics.js"></script>
+    <script src="js/algorithms/Pathfinder.js"></script>
+    <script src="js/algorithms/MazeGenerator.js"></script>
+    <script src="js/components/Toast.js"></script>
+    <script src="js/components/MazeGrid.js"></script>
+    <script src="js/components/Controls.js"></script>
+    <script src="js/components/StatsManager.js"></script>
+    <script src="js/components/Comparison.js"></script>
+    <script src="js/app.js"></script>
+  </body>
+</html>
